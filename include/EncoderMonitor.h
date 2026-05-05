@@ -15,31 +15,40 @@
 
 using namespace daisy;
 
+///////////////////////////////////////////////////////////////////////////////
+/// @brief 
+/// @tparam BackendType 
+/// @tparam numEncoders 
+/// @tparam numSteps 
 template <typename BackendType, uint32_t numEncoders, uint16_t numSteps = 20U>
 class EncoderMonitor
 {
   public:
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief 
     EncoderMonitor()
-    : queue_(nullptr),
-      backend_(nullptr),
-      idleTimeoutMs_(0),
-      lastCallSysTime_(0)
+    : queue_(nullptr), backend_(nullptr), idleTimeoutMs_(0), lastCallSysTime_(0)
     {
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief 
+    /// @param queueToAddEventsTo 
+    /// @param backend 
+    /// @param idleTimeoutMs 
     void Init(UiEventQueue& queueToAddEventsTo,
               BackendType&  backend,
               uint16_t      idleTimeoutMs = 250)
     {
-        queue_              = &queueToAddEventsTo;
-        backend_            = &backend;
-        idleTimeoutMs_      = idleTimeoutMs;
+        queue_         = &queueToAddEventsTo;
+        backend_       = &backend;
+        idleTimeoutMs_ = idleTimeoutMs;
 
         for(uint32_t i = 0; i < numEncoders; i++)
         {
-            encoderActive_[i] = false;
+            encoderActive_[i]     = false;
             encoderIncrements_[i] = 0;
-            idleTimeMs_[i] = 0;
+            idleTimeMs_[i]        = 0;
         }
 
         lastCallSysTime_ = System::GetNow();
@@ -48,6 +57,8 @@ class EncoderMonitor
     /** Checks the value of each encoder and generates messages for the UIEventQueue.
      *  Call this at regular intervals, ideally from your main() idle loop.
      */
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief 
     void Process()
     {
         const auto now      = System::GetNow();
@@ -58,13 +69,23 @@ class EncoderMonitor
             ProcessEncoder(i, backend_->Increment(i), timeDiff);
     }
 
-    /** Returns the BackendType that is used by the monitor. */
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Returns the BackendType that is used by the monitor. 
+    /// @return 
     BackendType& GetBackend() { return *backend_; }
 
-    /** Returns the number of encoders that are monitored by this class. */
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief Returns the number of encoders that are monitored by this class. 
+    /// @return 
     uint16_t GetNumEncodersMonitored() const { return numEncoders; }
 
   private:
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief 
+    /// @param id 
+    /// @param inc 
+    /// @param timeDiffMs 
     void ProcessEncoder(uint16_t id, int32_t inc, uint32_t timeDiffMs)
     {
         if(inc != 0)
@@ -72,10 +93,10 @@ class EncoderMonitor
             if(!encoderActive_[id])
             {
                 queue_->AddEncoderActivityChanged(id, true);
-                encoderActive_[id] = true;
+                encoderActive_[id]     = true;
                 encoderIncrements_[id] = 0;
             }
-            idleTimeMs_[id] = 0;
+            idleTimeMs_[id]        = 0;
             encoderIncrements_[id] = encoderIncrements_[id] + inc;
             queue_->AddEncoderTurned(id, encoderIncrements_[id], numSteps);
         }
@@ -87,15 +108,15 @@ class EncoderMonitor
                 if(idleTimeMs_[id] >= idleTimeoutMs_)
                 {
                     queue_->AddEncoderActivityChanged(id, false);
-                    encoderActive_[id] = false;
+                    encoderActive_[id]     = false;
                     encoderIncrements_[id] = 0;
-                    idleTimeMs_[id] = 0;
+                    idleTimeMs_[id]        = 0;
                 }
             }
         }
     }
 
-    EncoderMonitor(const EncoderMonitor&) = delete;
+    EncoderMonitor(const EncoderMonitor&)            = delete;
     EncoderMonitor& operator=(const EncoderMonitor&) = delete;
 
     UiEventQueue* queue_;

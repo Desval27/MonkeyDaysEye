@@ -24,11 +24,13 @@ enum class MenuFontSize : uint8_t
     FONT_TOOBIG,
 };
 
+///////////////////////////////////////////////////////////////////////////////
 /// @brief
 template <MenuFontSize FONT_SIZE = MenuFontSize::FONT_NORMAL>
 class FullScreenVerticalMenu : public AbstractMenu
 {
   public:
+    ///////////////////////////////////////////////////////////////////////////
     /// @brief
     /// @param items
     /// @param numItems
@@ -41,11 +43,13 @@ class FullScreenVerticalMenu : public AbstractMenu
               bool allowEntering = true)
     { AbstractMenu::Init(items, numItems, orientation, allowEntering); }
 
+    ///////////////////////////////////////////////////////////////////////////
     /// @brief
     /// @param canvasId
     void SetOneBitGraphicsDisplayToDrawTo(uint16_t canvasId)
     { canvasIdToDrawTo_ = canvasId; }
 
+    ///////////////////////////////////////////////////////////////////////////
     /// @brief
     /// @param canvas
     void Draw(const daisy::UiCanvasDescriptor &canvas) override
@@ -60,6 +64,7 @@ class FullScreenVerticalMenu : public AbstractMenu
     }
 
   protected:
+      ///////////////////////////////////////////////////////////////////////////
     /// @brief
     /// @param display
     virtual void InternalDraw(daisy::OneBitGraphicsDisplay &display)
@@ -102,7 +107,7 @@ class FullScreenVerticalMenu : public AbstractMenu
             FixedCapStr<20> itemText;
 
             // This is just a WIP.  For now
-            // based on the item append some 
+            // based on the item append some
             // sort of indicator text if possible
             itemText.Append(items_[itemIdx].text);
 
@@ -115,20 +120,16 @@ class FullScreenVerticalMenu : public AbstractMenu
                     else
                         itemText.Append("=NO");
                     break;
-                case ItemType::openUiPageItem:
-                    itemText.Append("...");
-                    break;
-                case ItemType::closeMenuItem:
-                    itemText.Append(" X");
-                    break;
+                case ItemType::openUiPageItem: itemText.Append("..."); break;
+                case ItemType::closeMenuItem: itemText.Append(" X"); break;
                 case ItemType::valueItem:
                     itemText.Append(' ');
-                    (*items_[itemIdx].asMappedValueItem.valueToModify).AppentToString(itemText);
+                    (*items_[itemIdx].asMappedValueItem.valueToModify)
+                        .AppentToString(itemText);
                     break;
                 default:
                 case ItemType::customItem:
-                case ItemType::callbackFunctionItem:
-                    break;
+                case ItemType::callbackFunctionItem: break;
             }
             if(isSelected)
                 display.DrawRect(itemRect, true, true);
@@ -140,6 +141,7 @@ class FullScreenVerticalMenu : public AbstractMenu
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     /// @brief
     /// @param canvas
     /// @return
@@ -165,6 +167,7 @@ class FullScreenVerticalMenu : public AbstractMenu
         return true;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     /// @brief
     /// @param size
     /// @return

@@ -19,117 +19,176 @@
 #include <Music/Music.h>
 
 const char *WAVEFORM_LABELS[] = {
-    "SIN",    "TRI",      "SAW",      "RAMP",
-    "SQUARE", "POLY TRI", "POLY SAW", "POLY SQUARE",
+    "SIN",
+    "TRI",
+    "SAW",
+    "RAMP",
+    "SQUARE",
+    "POLY TRI",
+    "POLY SAW",
+    "POLY SQUARE",
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// @brief
 // template <std::size_t OSCILLATOR_COUNT = 1>
-class BasicVoice {
-public:
-  struct BasicVoiceConfig 
-  {
-    BasicVoiceConfig(int period, int waveForm)
-      : period(Music::MIN_PERIOD, Music::MAX_PERIOD, period, 1, 1, "", false),
-        waveForm(WAVEFORM_LABELS, ArrayLen(WAVEFORM_LABELS), waveForm),
-        volume(0.0f, 1.0f, 1.0f, daisy::MappedFloatValue::Mapping::lin, "", 2, false),
-        balance(-1.0f, 1.0f, 0.0f, daisy::MappedFloatValue::Mapping::lin, "", 2, true),
-        fltFreq(0.0f, 16000.0f, 1000.0f, daisy::MappedFloatValue::Mapping::lin,
-                "Hz", 0, false),
-        fltRes(0.0f, 1.0f, 0.0f, daisy::MappedFloatValue::Mapping::lin, "", 2,
-               false),
-        fltEnvelope(0.2f, 0.5f, 1.0f),
-        ampLevel(-1.0f, 1.0f, 0.0f, daisy::MappedFloatValue::Mapping::lin, "",
-                 2, true),
-        ampEnvelope(0.1f, 0.5f, 1.0f)
-  // ampEnvelope(0.1f, 0.2f, 0.60f, 0.5f)
-      {}
+class BasicVoice
+{
+  public:
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief
+    struct BasicVoiceConfig
+    {
+        BasicVoiceConfig(int period, int waveForm)
+        : period(Music::MIN_PERIOD, Music::MAX_PERIOD, period, 1, 1, "", false),
+          waveForm(WAVEFORM_LABELS, ArrayLen(WAVEFORM_LABELS), waveForm),
+          volume(0.0f,
+                 1.0f,
+                 1.0f,
+                 daisy::MappedFloatValue::Mapping::lin,
+                 "",
+                 4,
+                 false),
+          balance(-1.0f,
+                  1.0f,
+                  0.0f,
+                  daisy::MappedFloatValue::Mapping::lin,
+                  "",
+                  4,
+                  true),
+          noiseLevel(0.0f,
+                     1.0f,
+                     0.0f,
+                     daisy::MappedFloatValue::Mapping::lin,
+                     "",
+                     4,
+                     false),
+          fltFreq(0.0f,
+                  16000.0f,
+                  1000.0f,
+                  daisy::MappedFloatValue::Mapping::lin,
+                  "Hz",
+                  0,
+                  false),
+          fltRes(0.0f,
+                 1.0f,
+                 0.0f,
+                 daisy::MappedFloatValue::Mapping::lin,
+                 "",
+                 4,
+                 false),
+          fltEnvelope(0.2f, 0.5f, 0.50f, 0.2f),
+          ampLevel(-1.0f,
+                   1.0f,
+                   0.0f,
+                   daisy::MappedFloatValue::Mapping::lin,
+                   "",
+                   4,
+                   true),
+          ampEnvelope(0.1f, 0.2f, 0.60f, 0.5f)
+        {
+        }
 
-    daisy::MappedIntValue period;
-    daisy::MappedStringListValue waveForm;
-    daisy::MappedFloatValue volume;
-    daisy::MappedFloatValue balance;
-    daisy::MappedFloatValue fltFreq;
-    daisy::MappedFloatValue fltRes;
-    ADEnvelope fltEnvelope;
-    daisy::MappedFloatValue ampLevel;
-    ADEnvelope ampEnvelope;
-    // ADSREnvelope ampEnvelope;
-  };
+        daisy::MappedIntValue        period;
+        daisy::MappedStringListValue waveForm;
+        daisy::MappedFloatValue      volume;
+        daisy::MappedFloatValue      balance;
+        daisy::MappedFloatValue      noiseLevel;
+        daisy::MappedFloatValue      fltFreq;
+        daisy::MappedFloatValue      fltRes;
+        ADSREnvelope                 fltEnvelope;
+        daisy::MappedFloatValue      ampLevel;
+        ADSREnvelope                 ampEnvelope;
+    };
 
-  BasicVoiceConfig config_;
+    BasicVoiceConfig config_;
 
-  BasicVoice()
-      : config_(4, daisysp::Oscillator::WAVE_TRI)
-  {}
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief
+    BasicVoice() : config_(4, daisysp::Oscillator::WAVE_TRI), gate_(false) {}
 
-  void Init(float sample_rate) {
-    osc_.Init(sample_rate);
-    //noise_.Init();
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief
+    /// @param sample_rate
+    void Init(float sample_rate)
+    {
+        osc_.Init(sample_rate);
+        nse_.Init();
+        flt_.Init(sample_rate);
+        fEnv_.Init(sample_rate);
+        aEnv_.Init(sample_rate);
+    }
 
-    flt_.Init(sample_rate);
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief
+    /// @return
+    std::tuple<float, float> Process()
+    {
+        float sigF = fEnv_.Process(gate_);
+        float sigA = aEnv_.Process(gate_);
+        
+        osc_.SetAmp(config_.volume);
 
-    fltEnv_.Init(sample_rate);
-    fltEnv_.SetMin(0.0f);
-    fltEnv_.SetCurve(0); // linear
+        float oscSig   = osc_.Process();
+        float nseSig = nse_.Process();
+        float nseRatio = config_.noiseLevel;
 
-    ampEnv_.Init(sample_rate);
-    ampEnv_.SetMin(0.0f);
-    ampEnv_.SetCurve(0); // linear
-  }
+        flt_.Process((oscSig * (1.0 - nseRatio)) + (nseSig * nseRatio));
+        float sig = flt_.Low();
 
-  std::tuple<float, float> Process() {
-  
-    // For now...
+        // Get balance coeffecients and apply
+        const float rCoeff = (config_.balance.Get() + 1.0f) / 2.0f;
+        const float lCoeff = 1.0f - rCoeff;
 
-    // sigL = sigR = osc_.Process();
-//    osc_.SetAmp(envOut);
+        return {sig * lCoeff, sig * rCoeff};
+    }
 
-//    float envOut = ampEnv_.Process();
-    // float sigL = flt_.Low();
-    // float sigR = flt_.High();
-    // noise_.SetAmp(config_.volume);
-    osc_.SetAmp(config_.volume);
-    flt_.Process(osc_.Process());
-    float sig = flt_.Low();
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief
+    /// @param nowMS
+    void Update(uint32_t nowMS)
+    {
+        osc_.SetWaveform(config_.waveForm);
 
-    // Get balance coeffecients and apply
-    const float rCoeff = (config_.balance.Get() + 1.0f) / 2.0f;
-    const float lCoeff = 1.0f - rCoeff;
+        flt_.SetFreq(config_.fltFreq);
+        flt_.SetRes(config_.fltRes);
 
-    return {sig * lCoeff, sig * rCoeff};
-  }
+        fEnv_.SetAttackTime(config_.fltEnvelope.attack);
+        fEnv_.SetDecayTime(config_.fltEnvelope.decay);
+        fEnv_.SetSustainLevel(config_.fltEnvelope.sustain);
+        fEnv_.SetReleaseTime(config_.fltEnvelope.release);
 
-  void Update(uint32_t nowMS) 
-  {
-    osc_.SetWaveform(config_.waveForm);
+        aEnv_.SetAttackTime(config_.fltEnvelope.attack);
+        aEnv_.SetDecayTime(config_.fltEnvelope.decay);
+        aEnv_.SetSustainLevel(config_.fltEnvelope.sustain);
+        aEnv_.SetReleaseTime(config_.fltEnvelope.release);
+    }
 
-    flt_.SetFreq(config_.fltFreq);
-    flt_.SetRes(config_.fltRes);
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief
+    /// @param value
+    void SetFreq(float value)
+    {
+        freq_ = value;
+        osc_.SetFreq(freq_);
+    }
 
-    fltEnv_.SetMax(config_.fltEnvelope.amount);
-    fltEnv_.SetTime(daisysp::ADENV_SEG_ATTACK, config_.fltEnvelope.attack);
-    fltEnv_.SetTime(daisysp::ADENV_SEG_DECAY, config_.fltEnvelope.decay);
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief
+    bool GetGate() const { return gate_; }
 
-    ampEnv_.SetMax(config_.ampEnvelope.amount);
-    ampEnv_.SetTime(daisysp::ADENV_SEG_ATTACK, config_.ampEnvelope.attack);
-    ampEnv_.SetTime(daisysp::ADENV_SEG_DECAY, config_.ampEnvelope.decay);
+    ///////////////////////////////////////////////////////////////////////////
+    /// @brief
+    /// @param value
+    void SetGate(bool value) { gate_ = value; }
 
-    // ampEnv_.SetAttackTime(config_.ampEnvelope.attack);
-    // ampEnv_.SetDecayTime(config_.ampEnvelope.decay);
-    // ampEnv_.SetSustainLevel(config_.ampEnvelope.sustain);
-    // ampEnv_.SetReleaseTime(config_.ampEnvelope.release);
-  }
+  private:
+    daisysp::Oscillator osc_;
+    daisysp::WhiteNoise nse_;
+    daisysp::Svf        flt_;
+    daisysp::Adsr       fEnv_;
+    daisysp::Adsr       aEnv_;
 
-  void SetFreq(float value)
-  {
-    osc_.SetFreq(value);
-  }
-
-private:
-  daisysp::Oscillator osc_;
-  // daisysp::WhiteNoise noise_;
-  daisysp::Svf   flt_;
-  daisysp::AdEnv fltEnv_;
-  daisysp::AdEnv ampEnv_;
-  // daisysp::Adsr ampEnv_;
+    float freq_;
+    bool  gate_;
 };

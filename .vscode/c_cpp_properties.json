@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../libDaisy/src",
-                "${workspaceFolder}/../"
+                "${workspaceFolder}/../",
+                "C:/msys64/home/pb91040/src/Monkey/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
