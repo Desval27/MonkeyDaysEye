@@ -16,33 +16,25 @@
 
 #include <Music/Gnome.h>
 #include <Music/EventSetManager.h>
-#include <BasicVoice.h>
+#include <SynthVoice.h>
 
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// @tparam VOICE_COUNT
-template <std::size_t VOICE_COUNT, std::size_t MAX_DEGREES = Music::DEF_MAX_DEGREES, std::size_t SCALE_DEGREES = Music::DEF_SCALE_DEGREES>
+template <std::size_t VOICE_COUNT,
+          std::size_t MAX_DEGREES   = Music::DEF_MAX_DEGREES,
+          std::size_t SCALE_DEGREES = Music::DEF_SCALE_DEGREES>
 class BasicApp
 {
     static_assert(VOICE_COUNT > 0, "BasicApp needs at least one voice.");
-    
+
     using AppSetup = Music::Setup<MAX_DEGREES, SCALE_DEGREES>;
 
   private:
     const uint32_t VOICE_REFRESH_MS = 100;
 
   public:
-
-    /////////////////////////////////////////////////////////////////////////////
-    /// @brief Singleton Instance
-    /// @return The Instance
-    static BasicApp &instance()
-    {
-        static BasicApp s;
-        return s;
-    }
-
     static constexpr std::size_t VoiceCount = VOICE_COUNT;
 
     /////////////////////////////////////////////////////////////////////////////
@@ -51,7 +43,7 @@ class BasicApp
     /// @param sample_rate
     void Init(float sample_rate)
     {
-        for(BasicVoice &v : voices)
+        for(SynthVoice &v : voices)
         {
             v.Init(sample_rate);
             v.Update(0UL); // Initial state
@@ -76,7 +68,7 @@ class BasicApp
         const float evenMix = 1.0 / VOICE_COUNT;
         float       mixL    = 0.0f;
         float       mixR    = 0.0f;
-        for(BasicVoice &v : voices)
+        for(SynthVoice &v : voices)
         {
             auto [sigL, sigR] = v.Process();
             mixL              = mixL + (sigL * evenMix);
@@ -96,7 +88,7 @@ class BasicApp
         {
             lastRefreshMS_ = nowMS - (delta % VOICE_REFRESH_MS);
 
-            for(BasicVoice &v : voices)
+            for(SynthVoice &v : voices)
                 v.Update(nowMS);
         }
     }
@@ -105,17 +97,9 @@ class BasicApp
     /// @brief
     /// @param index
     /// @return
-    BasicVoice *GetVoicePtr(std::size_t index) { return &voices[index]; }
+    SynthVoice *GetVoicePtr(std::size_t index) { return &voices[index]; }
 
-
-  private:
-    AppSetup     setup_;
-    Music::Gnome gnome_;
-    uint32_t     lastRefreshMS_;
-
-    std::array<BasicVoice, VOICE_COUNT>        voices;
-    std::array<Music::EventSetManager<>, VOICE_COUNT> voiceEvents;
-
+  protected:
     /////////////////////////////////////////////////////////////////////////////
     /// @brief
     BasicApp()
@@ -124,4 +108,13 @@ class BasicApp
       lastRefreshMS_(0UL)
     {
     }
+
+
+  private:
+    AppSetup     setup_;
+    Music::Gnome gnome_;
+    uint32_t     lastRefreshMS_;
+
+    std::array<SynthVoice, VOICE_COUNT>               voices;
+    std::array<Music::EventSetManager<>, VOICE_COUNT> voiceEvents;
 };

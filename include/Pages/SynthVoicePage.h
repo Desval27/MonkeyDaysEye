@@ -1,21 +1,21 @@
 #pragma once
 
-#include <BasicVoice.h>
+#include <SynthVoice.h>
 #include <Pages/FullScreenVerticalMenu.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief
-class VoicePage : public FullScreenVerticalMenu<>
+class SynthVoicePage : public FullScreenVerticalMenu<>
 {
   public:
     /////////////////////////////////////////////////////////////////////////////
     /// @brief
-    VoicePage() {}
+    SynthVoicePage() {}
 
     /////////////////////////////////////////////////////////////////////////////
     /// @brief
     /// @param voice
-    void Init(BasicVoice *voice)
+    void Init(SynthVoice *voice)
     {
         voice_ = voice;
 
@@ -94,7 +94,7 @@ class VoicePage : public FullScreenVerticalMenu<>
     }
 
   private:
-    BasicVoice *voice_;
+    SynthVoice *voice_;
 
     std::array<daisy::AbstractMenu::ItemConfig, 12> menuConfig_;
 
