@@ -114,7 +114,7 @@ class BasicApp
     uint32_t     lastRefreshMS_;
 
     std::array<BasicVoice, VOICE_COUNT>        voices;
-    std::array<EventSetManager<>, VOICE_COUNT> voiceEvents;
+    std::array<Music::EventSetManager<>, VOICE_COUNT> voiceEvents;
 
     /////////////////////////////////////////////////////////////////////////////
     /// @brief
