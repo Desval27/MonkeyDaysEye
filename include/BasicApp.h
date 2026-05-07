@@ -16,65 +16,35 @@
 
 #include <Music/Gnome.h>
 #include <Music/EventSetManager.h>
-#include <SynthVoice.h>
 
 
+template <std::size_t MAX_DEGREES   = Music::DEF_MAX_DEGREES,
+          std::size_t SCALE_DEGREES = Music::DEF_SCALE_DEGREES>
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// @tparam VOICE_COUNT
-template <std::size_t VOICE_COUNT,
-          std::size_t MAX_DEGREES   = Music::DEF_MAX_DEGREES,
-          std::size_t SCALE_DEGREES = Music::DEF_SCALE_DEGREES>
 class BasicApp
 {
-    static_assert(VOICE_COUNT > 0, "BasicApp needs at least one voice.");
-
     using AppSetup = Music::Setup<MAX_DEGREES, SCALE_DEGREES>;
 
   private:
-    const uint32_t VOICE_REFRESH_MS = 100;
+    const uint32_t COMPONENT_REFRESH_MS = 100;
 
   public:
-    static constexpr std::size_t VoiceCount = VOICE_COUNT;
-
     /////////////////////////////////////////////////////////////////////////////
     /// @brief Initializes app infrastructure including all voices based on the
     /// given sample rate
     /// @param sample_rate
-    void Init(float sample_rate)
+    virtual void Init(float sample_rate)
     {
-        for(SynthVoice &v : voices)
-        {
-            v.Init(sample_rate);
-            v.Update(0UL); // Initial state
-        }
-
-        // For giggles at the moment.
-        voices[0].SetFreq(110.0f);
-        if constexpr(VOICE_COUNT > 1)
-            voices[1].SetFreq(220.0f);
-        if constexpr(VOICE_COUNT > 2)
-            voices[2].SetFreq(440.0f);
-        if constexpr(VOICE_COUNT > 3)
-            voices[3].SetFreq(880.0f);
     }
 
     /////////////////////////////////////////////////////////////////////////////
     /// @brief Processes the audio stream for all voices mixed into separate left
     /// & right values.
     /// @return left & right floating point values.
-    std::tuple<float, float> Process()
+    virtual std::tuple<float, float> Process()
     {
-        const float evenMix = 1.0 / VOICE_COUNT;
-        float       mixL    = 0.0f;
-        float       mixR    = 0.0f;
-        for(SynthVoice &v : voices)
-        {
-            auto [sigL, sigR] = v.Process();
-            mixL              = mixL + (sigL * evenMix);
-            mixR              = mixR + (sigR * evenMix);
-        }
-        return {mixL, mixR};
+        return {0.0F, 0.0F};
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -84,20 +54,12 @@ class BasicApp
     void Update(uint32_t nowMS)
     {
         uint32_t delta = nowMS - lastRefreshMS_;
-        if(delta >= VOICE_REFRESH_MS)
+        if(delta >= COMPONENT_REFRESH_MS)
         {
-            lastRefreshMS_ = nowMS - (delta % VOICE_REFRESH_MS);
-
-            for(SynthVoice &v : voices)
-                v.Update(nowMS);
+            lastRefreshMS_ = nowMS - (delta % COMPONENT_REFRESH_MS);
+            InternalUpdate(nowMS);
         }
     }
-
-    /////////////////////////////////////////////////////////////////////////////
-    /// @brief
-    /// @param index
-    /// @return
-    SynthVoice *GetVoicePtr(std::size_t index) { return &voices[index]; }
 
   protected:
     /////////////////////////////////////////////////////////////////////////////
@@ -109,12 +71,14 @@ class BasicApp
     {
     }
 
+    virtual void InternalUpdate(uint32_t nowMS)
+    {
+        // Do Nothing Stub
+    }
+
 
   private:
     AppSetup     setup_;
     Music::Gnome gnome_;
     uint32_t     lastRefreshMS_;
-
-    std::array<SynthVoice, VOICE_COUNT>               voices;
-    std::array<Music::EventSetManager<>, VOICE_COUNT> voiceEvents;
 };

@@ -4,3 +4,6 @@
 [submodule "SeedProtoTest"]
 	path = SeedProtoTest
 	url = ./SeedProtoTest/
+[submodule "TheMachine"]
+	path = TheMachine
+	url = ./TheMachine/

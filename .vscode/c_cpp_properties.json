@@ -1,18 +1,46 @@
 {
     "configurations": [
         {
+            "name": "Win32",
+            "includePath": [
+                "${default}",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/../libDaisy/**",
+                "${workspaceFolder}/../DaisySP/Source/**",
+                "${workspaceFolder}/../../Monkey/include/**"
+            ],
+            "compilerPath": "arm-none-eabi-g++.exe",
+            "intelliSenseMode": "windows-gcc-x64",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "USE_DEBUG"
+            ],
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "configurationProvider": "ms-vscode.makefile-tools",            
+        },
+        {
             "name": "Linux",
             "includePath": [
+                "${default}",
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/../libDaisy/src",
-                "${workspaceFolder}/../",
-                "C:/msys64/home/pb91040/src/Monkey/include"
+                "${workspaceFolder}/../libDaisy/**",
+                "${workspaceFolder}/../DaisySP/Source/**",
+                "${workspaceFolder}/../../Monkey/include/**"
             ],
-            "defines": [],
-            "compilerPath": "/usr/bin/gcc",
-            "cStandard": "c17",
+            "compilerPath": "/usr/bin/arm-none-eabi-g++",
+            "intelliSenseMode": "linux-gcc-x64",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "USE_DEBUG"
+            ],
+            "cStandard": "gnu17",
             "cppStandard": "gnu++17",
-            "intelliSenseMode": "linux-gcc-x64"
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4
