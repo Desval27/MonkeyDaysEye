@@ -13,7 +13,7 @@
 #pragma once
 
 #include <BasicVoice.h>
-// #include <analogbassdrum.h>
+//#include <analogbassdrum.h>
 #include <daisy.h>
 #include <daisysp.h>
 
@@ -24,8 +24,8 @@ struct DrumVoiceConfig : public BasicVoiceConfig
   {
   }
 
-  daisy::MappedFloatValue freq{ 0.0F,   16000.0F,
-                                250.0F, daisy::MappedFloatValue::Mapping::lin,
+  daisy::MappedFloatValue freq{ 1.0F,   12000.0F,
+                                56.0F, daisy::MappedFloatValue::Mapping::log,
                                 "Hz",   0,
                                 false };
 
@@ -45,7 +45,6 @@ public:
   {
     BasicVoice::Init(sample_rate);
     t_.Init(sample_rate);
-    t_.SetFreq(50.f);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -54,12 +53,7 @@ public:
   std::tuple<float, float> Process(bool trigger = false) override
   {
     // Don't get anything from base class.
-    if (trigger) {
-      t_.SetTone(.7f * random() / (float)RAND_MAX);
-      t_.SetDecay(random() / (float)RAND_MAX);
-      // t_.SetSelfFmAmount(random() / (float)RAND_MAX);
-    }
-    float sig = t_.Process(trigger);
+    float sig = (t_.Process(trigger) * config_.volume);
     return balance_signal(sig);
   }
 
@@ -73,6 +67,6 @@ public:
     // t_.SetTone(config_.tone);
   }
 
-private:
+public:
   T t_;
 };

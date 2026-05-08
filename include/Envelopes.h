@@ -16,87 +16,89 @@
 
 struct ADEnvelope
 {
-    ADEnvelope(float defAttack, float defDecay, float defAmount = 1.0f)
+  ADEnvelope(float defAttack, float defDecay, float defAmount = 1.0f)
     : attack(0.0f,
              10.0f,
              defAttack,
              daisy::MappedFloatValue::Mapping::lin,
              "s",
              2,
-             false),
-      decay(0.0f,
+             false)
+    , decay(0.0f,
             10.0f,
             defDecay,
             daisy::MappedFloatValue::Mapping::lin,
             "s",
             2,
-            false),
-      amount(0.0f,
-            1.0f,
-            defAmount,
-            daisy::MappedFloatValue::Mapping::lin,
-            "",
-            2,
             false)
+    , amount(0.0f,
+             1.0f,
+             defAmount,
+             daisy::MappedFloatValue::Mapping::lin,
+             "",
+             2,
+             false)
 
-    {
-    }
+  {
+  }
 
+  daisy::MappedFloatValue attack;
+  daisy::MappedFloatValue decay;
+  daisy::MappedFloatValue amount;
 
-    daisy::MappedFloatValue attack;
-    daisy::MappedFloatValue decay;
-    daisy::MappedFloatValue amount;
-
-    void Draw(const daisy::UiCanvasDescriptor &canvas) {}
+  void Draw(const daisy::UiCanvasDescriptor& canvas) {}
 };
 
 struct ADSREnvelope
 {
-    ADSREnvelope(float defAttack, float defDecay, float defSustain, float defRelease, float defAmount = 1.0f)
+  ADSREnvelope(float defAttack,
+               float defDecay,
+               float defSustain,
+               float defRelease,
+               float defAmount = 1.0f)
     : attack(0.0f,
              10.0f,
              defAttack,
              daisy::MappedFloatValue::Mapping::lin,
              "s",
              2,
-             false),
-      decay(0.0f,
+             false)
+    , decay(0.0f,
             10.0f,
             defDecay,
             daisy::MappedFloatValue::Mapping::lin,
             "s",
             2,
-            false),
-      sustain(0.0f,
+            false)
+    , sustain(0.0f,
               1.0f,
               defSustain,
               daisy::MappedFloatValue::Mapping::lin,
               "",
               2,
-              false),
-      release(0.0f,
+              false)
+    , release(0.0f,
               10.0f,
               defRelease,
               daisy::MappedFloatValue::Mapping::lin,
               "s",
               2,
-              false),
-      amount(0.0f,
-            1.0f,
-            defAmount,
-            daisy::MappedFloatValue::Mapping::lin,
-            "",
-            2,
-            false)
-    {
-    }
+              false)
+    , amount(0.0f,
+             1.0f,
+             defAmount,
+             daisy::MappedFloatValue::Mapping::lin,
+             "",
+             2,
+             false)
+  {
+  }
 
+  daisy::MappedFloatValue attack;
+  daisy::MappedFloatValue decay;
+  daisy::MappedFloatValue sustain;
+  daisy::MappedFloatValue release;
+  daisy::MappedFloatValue amount;
 
-    daisy::MappedFloatValue attack;
-    daisy::MappedFloatValue decay;
-    daisy::MappedFloatValue sustain;
-    daisy::MappedFloatValue release;
-    daisy::MappedFloatValue amount;
-
-    void Draw(const daisy::UiCanvasDescriptor &canvas) {}
+  void Draw(const daisy::UiCanvasDescriptor& canvas) {}
 };
