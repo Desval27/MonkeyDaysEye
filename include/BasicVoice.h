@@ -15,8 +15,8 @@
 #include <daisysp.h>
 
 #include <Envelopes.h>
-#include <Monkey.h>
-#include <Music/Music.h>
+#include <monkey.hpp>
+#include <music/music.hpp>
 
 ///////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -64,12 +64,12 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param sample_rate
-  virtual void Init(float sample_rate) {}
+  virtual void init(float sample_rate) {}
 
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @return
-  virtual std::tuple<float, float> Process(bool trigger = false)
+  virtual std::tuple<float, float> process(bool trigger = false)
   {
     return { 0.0F, 0.0F };
   }
@@ -77,26 +77,26 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param nowMS
-  virtual void Update(uint32_t nowMS) {}
+  virtual void update(uint32_t nowMS) {}
 
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
-  bool GetGate() const { return gate_; }
+  bool get_gate() const { return gate_; }
 
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param value
-  void SetGate(bool value) { gate_ = value; }
+  void set_gate(bool value) { gate_ = value; }
 
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @return
-  bool GetTrigger() const { return trigger_; }
+  bool get_trigger() const { return trigger_; }
 
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param value
-  void SetTrigger(bool value) { trigger_ = value; }
+  void set_trigger(bool value) { trigger_ = value; }
 
 protected:
   ///////////////////////////////////////////////////////////////////////////

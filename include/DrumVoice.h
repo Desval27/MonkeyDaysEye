@@ -40,16 +40,16 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param sample_rate
-  void Init(float sample_rate) override
+  void init(float sample_rate) override
   {
-    BasicVoice::Init(sample_rate);
+    BasicVoice::init(sample_rate);
     t_.Init(sample_rate);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @return
-  std::tuple<float, float> Process(bool trigger = false) override
+  std::tuple<float, float> process(bool trigger = false) override
   {
     // Don't get anything from base class.
     float sig = (t_.Process(trigger) * config_.volume);
@@ -59,9 +59,9 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param nowMS
-  void Update(uint32_t nowMS) override
+  void update(uint32_t nowMS) override
   {
-    BasicVoice::Update(nowMS);
+    BasicVoice::update(nowMS);
     // t_.SetFreq(config_.freq);
     // t_.SetTone(config_.tone);
   }

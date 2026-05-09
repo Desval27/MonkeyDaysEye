@@ -21,7 +21,7 @@ struct SynthVoiceConfig : public BasicVoiceConfig
 {
   SynthVoiceConfig()
     : BasicVoiceConfig()
-    , period(Music::MIN_PERIOD, Music::MAX_PERIOD, 0, 1, 1, "", false)
+    , period(music::MIN_PERIOD, music::MAX_PERIOD, 0, 1, 1, "", false)
     , waveForm(WAVEFORM_LABELS,
                ArrayLen(WAVEFORM_LABELS),
                daisysp::Oscillator::WAVE_TRI)
@@ -74,9 +74,9 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param sample_rate
-  void Init(float sample_rate) override
+  void init(float sample_rate) override
   {
-    BasicVoice::Init(sample_rate);
+    BasicVoice::init(sample_rate);
 
     osc_.Init(sample_rate);
     nse_.Init();
@@ -88,7 +88,7 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @return
-  std::tuple<float, float> Process(bool trigger = false) override
+  std::tuple<float, float> process(bool trigger = false) override
   {
     // Don't get anything from base class.
 
@@ -110,9 +110,9 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param nowMS
-  void Update(uint32_t nowMS) override
+  void update(uint32_t nowMS) override
   {
-    BasicVoice::Update(nowMS);
+    BasicVoice::update(nowMS);
 
     osc_.SetWaveform(config_.waveForm);
 
@@ -135,7 +135,7 @@ public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param value
-  void SetFreq(float value)
+  void set_freq(float value)
   {
     freq_ = value;
     osc_.SetFreq(freq_);
