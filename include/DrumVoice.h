@@ -33,16 +33,22 @@ struct DrumVoiceConfig : public BasicVoiceConfig
   };
 };
 
-template<typename T>
-class DrumVoice : public BasicVoice<DrumVoiceConfig>
+template<typename T,
+         std::size_t MAX_DEGREES = music::DEF_MAX_DEGREES,
+         std::size_t SCALE_DEGREES = music::DEF_SCALE_DEGREES,
+         typename VOICE_CONFIG = DrumVoiceConfig>
+class DrumVoice : public BasicVoice<MAX_DEGREES, SCALE_DEGREES, VOICE_CONFIG>
 {
+  using TSetup = music::Setup<MAX_DEGREES, SCALE_DEGREES>;
+  using TBasicVoice = BasicVoice<MAX_DEGREES, SCALE_DEGREES, VOICE_CONFIG>;
+
 public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param sample_rate
-  void init(float sample_rate) override
+  void init(const TSetup& setup, int periodOffset, float sample_rate) override
   {
-    BasicVoice::init(sample_rate);
+    TBasicVoice::init(setup, periodOffset, sample_rate);
     t_.Init(sample_rate);
   }
 
@@ -52,8 +58,8 @@ public:
   std::tuple<float, float> process(bool trigger = false) override
   {
     // Don't get anything from base class.
-    float sig = (t_.Process(trigger) * config_.volume);
-    return balance_signal(sig);
+    float sig = (t_.Process(trigger) * TBasicVoice::config_.volume);
+    return TBasicVoice::balance_signal(sig);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -61,7 +67,7 @@ public:
   /// @param nowMS
   void update(uint32_t nowMS) override
   {
-    BasicVoice::update(nowMS);
+    TBasicVoice::update(nowMS);
     // t_.SetFreq(config_.freq);
     // t_.SetTone(config_.tone);
   }

@@ -73,16 +73,16 @@ template<std::size_t MAX_DEGREES = music::DEF_MAX_DEGREES,
          typename VOICE_CONFIG = SynthVoiceConfig>
 class SynthVoice : public BasicVoice<MAX_DEGREES, SCALE_DEGREES, VOICE_CONFIG>
 {
-  using MySetup = music::Setup<MAX_DEGREES, SCALE_DEGREES>;
-  using MyBasicVoice = BasicVoice<MAX_DEGREES, SCALE_DEGREES, VOICE_CONFIG>;
+  using TSetup = music::Setup<MAX_DEGREES, SCALE_DEGREES>;
+  using TBasicVoice = BasicVoice<MAX_DEGREES, SCALE_DEGREES, VOICE_CONFIG>;
 
 public:
   ///////////////////////////////////////////////////////////////////////////
   /// @brief
   /// @param sample_rate
-  void init(const MySetup& setup, int periodOffset, float sample_rate) override
+  void init(const TSetup& setup, int periodOffset, float sample_rate) override
   {
-    MyBasicVoice::init(setup, periodOffset, sample_rate);
+    TBasicVoice::init(setup, periodOffset, sample_rate);
 
     osc_.Init(sample_rate);
     vib_.Init(sample_rate);
@@ -104,21 +104,21 @@ public:
 
     float vib_val = vib_.Process();
     float freq =
-      MyBasicVoice::get_base_frequency() * (1.0f + (vib_val * vib_depth));
+      TBasicVoice::get_base_frequency() * (1.0f + (vib_val * vib_depth));
     osc_.SetFreq(freq);
 
     // Volume Processing
-    float sigA = aEnv_.Process(MyBasicVoice::get_gate());
+    float sigA = aEnv_.Process(TBasicVoice::get_gate());
     osc_.SetAmp(sigA); // Take into consideration amp level
 
     // Mix and Filter
     float oscSig = osc_.Process();
     float nseSig = nse_.Process() * sigA;
-    float nseRatio = MyBasicVoice::config_.noiseLevel;
+    float nseRatio = TBasicVoice::config_.noiseLevel;
     flt_.Process((oscSig * (1.0 - nseRatio)) + (nseSig * nseRatio));
     float sig = flt_.Low();
 
-    return MyBasicVoice::balance_signal(sig);
+    return TBasicVoice::balance_signal(sig);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -126,30 +126,30 @@ public:
   /// @param nowMS
   void update(uint32_t nowMS) override
   {
-    MyBasicVoice::update(nowMS);
+    TBasicVoice::update(nowMS);
 
-    osc_.SetWaveform(MyBasicVoice::config_.waveForm);
+    osc_.SetWaveform(TBasicVoice::config_.waveForm);
 
     // Vibrato Configuration
     vib_.SetWaveform(daisysp::Oscillator::WAVE_SIN);
     vib_.SetFreq(5.0F); // Typical?
 
-    flt_.SetFreq(MyBasicVoice::config_.fltFreq);
-    flt_.SetRes(MyBasicVoice::config_.fltRes);
+    flt_.SetFreq(TBasicVoice::config_.fltFreq);
+    flt_.SetRes(TBasicVoice::config_.fltRes);
 
     fEnv_.SetTime(daisysp::ADENV_SEG_ATTACK,
-                  MyBasicVoice::config_.fltEnvelope.attack);
+                  TBasicVoice::config_.fltEnvelope.attack);
     fEnv_.SetTime(daisysp::ADENV_SEG_DECAY,
-                  MyBasicVoice::config_.fltEnvelope.decay);
+                  TBasicVoice::config_.fltEnvelope.decay);
     // fEnv_.SetAttackTime(config_.fltEnvelope.attack);
     // fEnv_.SetDecayTime(config_.fltEnvelope.decay);
     // fEnv_.SetSustainLevel(config_.fltEnvelope.sustain);
     // fEnv_.SetReleaseTime(config_.fltEnvelope.release);
 
-    aEnv_.SetAttackTime(MyBasicVoice::config_.ampEnvelope.attack);
-    aEnv_.SetDecayTime(MyBasicVoice::config_.ampEnvelope.decay);
-    aEnv_.SetSustainLevel(MyBasicVoice::config_.ampEnvelope.sustain);
-    aEnv_.SetReleaseTime(MyBasicVoice::config_.ampEnvelope.release);
+    aEnv_.SetAttackTime(TBasicVoice::config_.ampEnvelope.attack);
+    aEnv_.SetDecayTime(TBasicVoice::config_.ampEnvelope.decay);
+    aEnv_.SetSustainLevel(TBasicVoice::config_.ampEnvelope.sustain);
+    aEnv_.SetReleaseTime(TBasicVoice::config_.ampEnvelope.release);
   }
 
   void handle_pulse(int pulse,
@@ -159,10 +159,10 @@ public:
   {
     set_vibrato_on(note.value > music::NoteValue::Eighth);
 
-    MyBasicVoice::set_base_frequency(
-      MyBasicVoice::get_frequency_for_note(note.note, note.period));
-    MyBasicVoice::set_gate(gate);
-    MyBasicVoice::set_trigger(trigger);
+    TBasicVoice::set_base_frequency(
+      TBasicVoice::get_frequency_for_note(note.note, note.period));
+    TBasicVoice::set_gate(gate);
+    TBasicVoice::set_trigger(trigger);
   }
 
   ///////////////////////////////////////////////////////////////////////////
