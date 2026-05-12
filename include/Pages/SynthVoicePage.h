@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Pages/FullScreenVerticalMenu.h>
-#include <SynthVoice.h>
+#include <synth_voice.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @brief

@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <BasicVoice.h>
+#include <basic_voice.hpp>
 // #include <analogbassdrum.h>
 #include <daisy.h>
 #include <daisysp.h>

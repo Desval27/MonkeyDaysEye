@@ -17,7 +17,7 @@
 #include <music/event_set_manager.hpp>
 #include <music/gnome.hpp>
 
-#include <SynthVoice.h>
+#include <synth_voice.hpp>
 
 template<std::size_t MAX_DEGREES = music::DEF_MAX_DEGREES,
          std::size_t SCALE_DEGREES = music::DEF_SCALE_DEGREES>

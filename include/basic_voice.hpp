@@ -15,7 +15,7 @@
 #include <daisy_helpers.h>
 #include <daisysp.h>
 
-#include <Envelopes.h>
+#include <envelopes.hpp>
 #include <monkey.hpp>
 #include <music/music.hpp>
 #include <music/music_config.hpp>

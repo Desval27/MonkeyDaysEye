@@ -11,7 +11,7 @@
  */
 #pragma once
 
-#include <DrumVoice.h>
+#include <drum_voice.hpp>
 #include <Pages/FullScreenVerticalMenu.h>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -17,8 +17,8 @@
 #include <daisy_seed.h>
 #include <daisysp.h>
 
-#include <EncoderMonitor.h>
-#include <TurnOnlyEncoder.h>
+#include <encoder_monitor.hpp>
+#include <turn_only_encoder.hpp>
 
 constexpr uint32_t DISPLAY_UPDATE_RATE_MS = 60;
 constexpr uint32_t SCREEN_SAVER_TIMEOUT_MS = 5000;
