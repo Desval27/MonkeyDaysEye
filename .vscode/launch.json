@@ -5,6 +5,28 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Cortex Debug (SRAM)",
+            "cwd": "${workspaceFolder}/ChoirSATB",
+            "executable": "./build/ChoirSATB.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "STM32H750IB", 
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32h7x.cfg"
+            ],
+            "postLaunchCommands": [
+                "monitor reset halt",
+                "load",            // Explicitly tells the debugger to push the code to RAM
+                "thb main",        // Temporary Hardware Breakpoint
+                "continue"            
+            ],
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        },
+
+        {
             "configFiles": [
                 "interface/stlink.cfg",
                 "target/stm32h7x.cfg"
